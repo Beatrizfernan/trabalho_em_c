@@ -200,16 +200,17 @@ void rotacao_direita_rn(NoRN **raiz, NoRN *y) {
 void corrigir_insercao_rn(NoRN **raiz, NoRN *z) {
     while (z->pai && z->pai->cor == VERMELHO) {
         if (!z->pai->pai) break;
-        
+        //Pai é filho esquerdo do avô
         if (z->pai == z->pai->pai->esq) {
             NoRN *y = z->pai->pai->dir;
-            
+            //Tio VERMELHO
             if (y && y->cor == VERMELHO) {
                 z->pai->cor = PRETO;
                 y->cor = PRETO;
                 z->pai->pai->cor = VERMELHO;
                 z = z->pai->pai;
             } else {
+                //z é filho DIREITO 
                 if (z == z->pai->dir) {
                     z = z->pai;
                     rotacao_esquerda_rn(raiz, z);
@@ -268,26 +269,31 @@ NoRN* min_valor_no_rn(NoRN *n) {
 void corrigir_remocao_rn(NoRN **raiz, NoRN *x, NoRN *pai_x) {
     while (x != *raiz && (!x || x->cor == PRETO)) {
         if (!pai_x) break;
-        
-        if (x == pai_x->esq) {
+
+        // x está à ESQUERDA do pai
+        if (x == pai_x->esq) { 
             NoRN *w = pai_x->dir;
+            // Caso 1: irmão vermelho
             if (w && w->cor == VERMELHO) {
                 w->cor = PRETO;
                 pai_x->cor = VERMELHO;
                 rotacao_esquerda_rn(raiz, pai_x);
                 w = pai_x->dir;
             }
+            // ========== CASO 2 ==========
             if (w && (!w->esq || w->esq->cor == PRETO) && (!w->dir || w->dir->cor == PRETO)) {
                 if (w) w->cor = VERMELHO;
                 x = pai_x;
                 pai_x = x ? x->pai : NULL;
             } else {
+                // CASO 3:
                 if (w && (!w->dir || w->dir->cor == PRETO)) {
                     if (w->esq) w->esq->cor = PRETO;
                     w->cor = VERMELHO;
                     rotacao_direita_rn(raiz, w);
                     w = pai_x->dir;
                 }
+                // CASO 4:
                 if (w) {
                     w->cor = pai_x->cor;
                     pai_x->cor = PRETO;
@@ -297,24 +303,28 @@ void corrigir_remocao_rn(NoRN **raiz, NoRN *x, NoRN *pai_x) {
                 x = *raiz;
             }
         } else {
+
             NoRN *w = pai_x->esq;
+            // CASO 1
             if (w && w->cor == VERMELHO) {
                 w->cor = PRETO;
                 pai_x->cor = VERMELHO;
                 rotacao_direita_rn(raiz, pai_x);
                 w = pai_x->esq;
             }
+             // ========== CASO 2 ==========
             if (w && (!w->dir || w->dir->cor == PRETO) && (!w->esq || w->esq->cor == PRETO)) {
                 if (w) w->cor = VERMELHO;
                 x = pai_x;
                 pai_x = x ? x->pai : NULL;
-            } else {
+            } else {// CASO 3: 
                 if (w && (!w->esq || w->esq->cor == PRETO)) {
                     if (w->dir) w->dir->cor = PRETO;
                     if (w) w->cor = VERMELHO;
                     rotacao_esquerda_rn(raiz, w);
                     w = pai_x->esq;
                 }
+                // CASO 4: filho direito do irmão é vermelho
                 if (w) {
                     w->cor = pai_x->cor;
                     pai_x->cor = PRETO;
@@ -342,6 +352,7 @@ void remover_rn(NoRN **raiz, int chave) {
     NoRN *x;
     Cor cor_original = y->cor;
     NoRN *pai_x;
+
     
     if (!z->esq) {
         x = z->dir;
